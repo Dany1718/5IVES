@@ -6,19 +6,19 @@ import {
   Text,
   ImageBackground,
   Image,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
 import useAuth from "../hooks/useAuth";
-import tw from "tailwind-react-native-classnames"
+import tw from "tailwind-react-native-classnames";
 import { FIREBASE_AUTH } from "../FirebaseConfig";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import CustomButton from "../components/customButton";
-import GoogleSVG from '../assets/google.svg'
-import { SvgXml } from 'react-native-svg'
+import { SvgXml } from "react-native-svg";
+import { KeyboardAvoidingView } from "react-native";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -64,54 +64,67 @@ const LoginScreen = () => {
     </g>
   </svg>`;
   return (
-    <View style={tw`flex-1`
-    }>
+    <View style={tw`flex-1`}>
       <ImageBackground
         resizeMode="cover"
         style={tw`flex-1`}
         source={require("../assets/workout3.jpg")}
       >
         <View style={styles.root}>
-          <Image source={require('../assets/lne-12.png')} style={styles.logo} resizeMode="contain"/>
+          <Image
+            source={require("../assets/lne-12.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
         </View>
-        <View style={styles.container}>
-          <TextInput
-            value={email}
-            style={styles.input}
-            placeholder="Email"
-            autoCapitalize="none"
-            onChangeText={(text) => setEmail(text)}
-          ></TextInput>
-          <TextInput
-            secureTextEntry={true}
-            value={password}
-            style={styles.input}
-            placeholder="Password"
-            autoCapitalize="none"
-            onChangeText={(text) => setPassword(text)}
-          ></TextInput>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : null}
+          style={{ flex: 1 }}
+        >
+          <View style={styles.container}>
+            <TextInput
+              value={email}
+              style={styles.input}
+              placeholder="Email"
+              autoCapitalize="none"
+              onChangeText={(text) => setEmail(text)}
+            ></TextInput>
+            <TextInput
+              secureTextEntry={true}
+              value={password}
+              style={styles.input}
+              placeholder="Password"
+              autoCapitalize="none"
+              onChangeText={(text) => setPassword(text)}
+            ></TextInput>
 
-          {loading ? (
-            <ActivityIndicator size="large" color="#7eaf34" />
-          ) : (
-            <CustomButton text="Log in" onPress={signIn}/>
-          )}
-          <Text style={styles.options}>
-          Or log in with
-          </Text>
-          <View style={styles.rowForGoogle}>
-          <TouchableOpacity onPress={() => {}} style={styles.googleOption}>
-            <SvgXml xml={xml} height={24} width={24}/>
-          </TouchableOpacity>
+            {loading ? (
+              <ActivityIndicator size="large" color="#7eaf34" />
+            ) : (
+              <CustomButton text="Log in" onPress={signIn} />
+            )}
           </View>
-        </View>
+        </KeyboardAvoidingView>
+        <View style={styles.container2}>
+          <View style={{ flexDirection: "row" }}>
+            <View style={styles.horizontalRule} />
+            <Text style={styles.options}>Or log in with</Text>
+            <View style={styles.horizontalRule} />
+          </View>
+
+          <View style={styles.rowForGoogle}>
+            <TouchableOpacity onPress={() => {}} style={styles.googleOption}>
+              <SvgXml xml={xml} height={24} width={24} />
+            </TouchableOpacity>
+          </View>
+        
         <View style={styles.signUpRow}>
-          <Text style={{color: '#fff'}}>Dont have an account? </Text>
+          <Text style={{ color: "#fff" }}>Dont have an account? </Text>
           <TouchableOpacity onPress={() => signUp()}>
-          <Text style={{color: '#7eaf34'}}>Sign up</Text>
+            <Text style={{ color: "#7eaf34" }}>Sign up</Text>
           </TouchableOpacity>
         </View>
-          
+        </View>
       </ImageBackground>
     </View>
   );
@@ -122,7 +135,12 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 40,
-    justifyContent: "center",
+    justifyContent: "flex-end",
+  },
+  container2: {
+    marginHorizontal: 40,
+    justifyContent: "flex-end",
+    paddingBottom: 50,
   },
   input: {
     marginVertical: 5,
@@ -130,30 +148,41 @@ const styles = StyleSheet.create({
     height: 50,
     borderWidth: 1,
     borderRadius: 5,
-    borderColor: '#e8e8e8',
+    borderColor: "#e8e8e8",
     backgroundColor: "#fff",
   },
   root: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   options: {
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 20,
+    marginLeft: 10,
+    marginRight: 10,
     marginBottom: 20,
-    color: '#fff',
-  }, googleOption: {
-    borderColor: '#ddd',
+    color: "#fff",
+  },
+  googleOption: {
+    borderColor: "#ddd",
     borderWidth: 2,
     borderRadius: 10,
     paddingHorizontal: 30,
     paddingVertical: 10,
-  }, rowForGoogle: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+  },
+  rowForGoogle: {
+    flexDirection: "row",
+    justifyContent: "center",
     marginBottom: 30,
-  }, signUpRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+  },
+  signUpRow: {
+    flexDirection: "row",
+    justifyContent: "center",
     marginBottom: 30,
-  }
+  },
+  horizontalRule: {
+    backgroundColor: "grey",
+    height: 1,
+    flex: 1,
+    alignSelf: "center",
+  },
 });
