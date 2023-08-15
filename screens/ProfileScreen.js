@@ -12,7 +12,7 @@ const ProfileScreen = () => {
   const navigation = useNavigation();
   return (
     <View>
-      <Button onPress={() => logOut()} title="logout"/>
+      <Button onPress={logOut} title="logout"/>
     </View>
   );
 }

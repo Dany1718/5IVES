@@ -1,12 +1,10 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
-import HomeScreen from "./screens/HomeScreen";
-import ProfileScreen from "./screens/ProfileScreen";
-import LoginScreen from "./screens/LoginScreen";
-import RegisterScreen from "./screens/RegisterScreen"
+import MainStackScreens from "./MainStackScreens";
+import AuthStackScreens from "./AuthStackScreens";
 import { useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { FIREBASE_AUTH } from "./FirebaseConfig";
+import { FIREBASE_AUTH } from "../FirebaseConfig";
 
 const Stack = createNativeStackNavigator();
 
@@ -18,17 +16,14 @@ const StackNavigator = () => {
       setUser(user);
     });
   }, []);
-  console.log(user);
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{headerShown: false}}>
       {user ? (
-        <>
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
-        </>
+        <Stack.Screen name="Main" component={MainStackScreens}/>
       ) : (
-        <>
+        <Stack.Screen name="Auth" component={AuthStackScreens}/>
+        /*<>
           <Stack.Screen
             name="LogIn"
             component={LoginScreen}
@@ -39,7 +34,7 @@ const StackNavigator = () => {
             component={RegisterScreen}
             options={{ headerShown: false }}
           />
-        </>
+        </>*/
       )}
     </Stack.Navigator>
   );

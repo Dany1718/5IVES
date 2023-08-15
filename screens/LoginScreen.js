@@ -13,7 +13,6 @@ import styled from "styled-components/native";
 import React, { useEffect, useState, useCallback } from "react";
 import tw from "tailwind-react-native-classnames";
 import { FIREBASE_AUTH } from "../FirebaseConfig";
-import { useNavigation } from "@react-navigation/native";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -178,6 +177,20 @@ const LoginScreen = () => {
         {register ? (
           <>
             <View style={styles.root2}>
+            <Text
+                style={{
+                  fontSize: 35,
+                  justifyContent: "center",
+                  color: "#7eaf34",
+                  paddingBottom: 20,
+                  letterSpacing: 5,
+                  height: 60,
+                  fontFamily: "SpaceMono_700Bold",
+                  fontWeight: 500,
+                }}
+              >
+                5
+              </Text>
               <Text
                 style={{
                   fontSize: 35,
@@ -189,9 +202,8 @@ const LoginScreen = () => {
                   paddingBottom: 10,
                 }}
               >
-                5IVES
+                IVES
               </Text>
-              
             </View>
             <View style={styles.root3}></View>
             <KeyboardAvoidingView
@@ -199,22 +211,22 @@ const LoginScreen = () => {
               style={{ flex: 1 }}
             >
               <View style={styles.container3}>
-              <View style={styles.root4}>
-              <Text
-                style={{
-                  fontSize: 25,
-                  justifyContent: "center",
-                  color: "#7eaf34",
-                  letterSpacing: 2,
-                  fontFamily: "SpaceMono_400Regular",
-                  fontWeight: 500,
-                  alignItems: "center",
-                }}
-              >
-                LETS GET STARTED!
-              </Text>
-              </View>
-              
+                <View style={styles.root4}>
+                  <Text
+                    style={{
+                      fontSize: 25,
+                      justifyContent: "center",
+                      color: "#7eaf34",
+                      letterSpacing: 2,
+                      fontFamily: "SpaceMono_400Regular",
+                      fontWeight: 500,
+                      alignItems: "center",
+                    }}
+                  >
+                    LETS GET STARTED!
+                  </Text>
+                </View>
+
                 <ProfilePhotoContainer onPress={addProfilePicture}>
                   {profilePicture ? (
                     <ProfilePicture source={{ uri: profilePicture }} />
@@ -223,8 +235,15 @@ const LoginScreen = () => {
                       <AntDesign name="plus" size={24} color="#ffffff" />
                     </DefaultProfilePhoto>
                   )}
-                </ProfilePhotoContainer>  
-                <View style={{ justifyContent: "center", paddingBottom: 20, alignItems: "center", paddingTop: 10}}>
+                </ProfilePhotoContainer>
+                <View
+                  style={{
+                    justifyContent: "center",
+                    paddingBottom: 20,
+                    alignItems: "center",
+                    paddingTop: 10,
+                  }}
+                >
                   <Text
                     style={{
                       fontSize: 15,
@@ -266,7 +285,6 @@ const LoginScreen = () => {
                   <CustomButton text="Create an account" onPress={signIn} />
                 )}
               </View>
-
             </KeyboardAvoidingView>
             <View style={styles.container2}>
               <View style={styles.signUpRow}>
@@ -288,11 +306,25 @@ const LoginScreen = () => {
                   paddingBottom: 20,
                   letterSpacing: 5,
                   height: 60,
+                  fontFamily: "SpaceMono_700Bold",
+                  fontWeight: 500,
+                }}
+              >
+                5
+              </Text>
+              <Text
+                style={{
+                  fontSize: 35,
+                  justifyContent: "center",
+                  color: "#7eaf34",
+                  paddingBottom: 20,
+                  letterSpacing: 5,
+                  height: 60,
                   fontFamily: "SpaceMono_400Regular",
                   fontWeight: 500,
                 }}
               >
-                5IVES
+                IVES
               </Text>
             </View>
             <KeyboardAvoidingView
@@ -382,12 +414,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: 475,
+    flexDirection: "row"
   },
   root2: {
     alignItems: "center",
     justifyContent: "center",
     height: 100,
     paddingTop: 40,
+    flexDirection: "row"
   },
   root3: {
     alignItems: "center",
@@ -454,5 +488,4 @@ const DefaultProfilePhoto = styled.View`
 `;
 const ProfilePicture = styled.Image`
   flex: 1;
-
-`
+`;

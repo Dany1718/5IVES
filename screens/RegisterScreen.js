@@ -13,16 +13,13 @@ import tw from "tailwind-react-native-classnames";
 import { FIREBASE_AUTH } from "../FirebaseConfig";
 import {
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
 } from "firebase/auth";
 import CustomButton from "../components/customButton";
-import { SvgXml } from "react-native-svg";
 import { KeyboardAvoidingView } from "react-native";
 import {
   GoogleSignin,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
-import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 
 GoogleSignin.configure({
