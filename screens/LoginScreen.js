@@ -7,11 +7,13 @@ import {
   ImageBackground,
   Image,
   TouchableOpacity,
+  Platform,
 } from "react-native";
-import React, { useState } from "react";
-import useAuth from "../hooks/useAuth";
+import styled from "styled-components/native";
+import React, { useEffect, useState, useCallback } from "react";
 import tw from "tailwind-react-native-classnames";
 import { FIREBASE_AUTH } from "../FirebaseConfig";
+import { useNavigation } from "@react-navigation/native";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -19,12 +21,104 @@ import {
 import CustomButton from "../components/customButton";
 import { SvgXml } from "react-native-svg";
 import { KeyboardAvoidingView } from "react-native";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+import * as ImagePicker from "expo-image-picker";
+import { AntDesign } from "@expo/vector-icons";
+import {
+  useFonts,
+  SpaceMono_400Regular,
+  SpaceMono_400Regular_Italic,
+  SpaceMono_700Bold,
+  SpaceMono_700Bold_Italic,
+} from "@expo-google-fonts/space-mono";
+
+GoogleSignin.configure({
+  webClientId:
+    "323061027026-67go2ubi9im7crevaeo7oi7hlqc8op7m.apps.googleusercontent.com", // client ID of type WEB for your server (needed to verify user ID and offline access)
+});
 
 const LoginScreen = () => {
+  const [name, setName] = useState("");
+  const [profilePicture, setProfilePicture] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [register, setRegister] = useState(false);
+  const [appIsReady, setAppIsReady] = useState(false);
   const auth = FIREBASE_AUTH;
+  useFonts({
+    SpaceMono_400Regular,
+    SpaceMono_400Regular_Italic,
+    SpaceMono_700Bold,
+    SpaceMono_700Bold_Italic,
+  });
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 1));
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        // Tell the application to render
+        setAppIsReady(true);
+      }
+    }
+
+    prepare();
+  }, []);
+
+  const handlePageChange = () => {
+    register ? setRegister(false) : setRegister(true);
+  };
+
+  const getPermission = async () => {
+    if (Platform.OS !== "web") {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync(
+        ImagePicker.CAMERA_ROLL
+      );
+      return status;
+    }
+  };
+  const pickImage = async () => {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.5,
+      });
+
+      if (!result.canceled) {
+        setProfilePicture(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.log("Error @pickImage: ", error);
+    }
+  };
+
+  const addProfilePicture = async () => {
+    const status = await getPermission();
+
+    if (status !== "granted") {
+      alert("We need permission to access your camera roll.");
+      return;
+    }
+
+    pickImage();
+  };
+
+  const signInGoogle = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const { idToken } = await GoogleSignin.signIn();
+      const googleCredentials = GoogleAuthProvider.credential(idToken);
+      await signInWithCredential(auth, googleCredentials);
+    } catch (error) {
+      console.log("got error: ", error.message);
+    }
+  };
 
   const signIn = async () => {
     setLoading(true);
@@ -50,10 +144,12 @@ const LoginScreen = () => {
       console.log(response);
     } catch (error) {
       console.log(error);
+      alert("Sign in failed: " + error.message);
     } finally {
       setLoading(false);
     }
   };
+
   const xml = `<?xml version="1.0" encoding="utf-8"?>
   <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
     <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
@@ -63,6 +159,15 @@ const LoginScreen = () => {
       <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z"/>
     </g>
   </svg>`;
+  const onLayoutRootView = useCallback(async () => {
+    if (appIsReady) {
+      await SplashScreen.hideAsync();
+    }
+  }, [appIsReady]);
+
+  if (!appIsReady) {
+    return null;
+  }
   return (
     <View style={tw`flex-1`}>
       <ImageBackground
@@ -70,61 +175,179 @@ const LoginScreen = () => {
         style={tw`flex-1`}
         source={require("../assets/workout3.jpg")}
       >
-        <View style={styles.root}>
-          <Image
-            source={require("../assets/lne-12.png")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </View>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : null}
-          style={{ flex: 1 }}
-        >
-          <View style={styles.container}>
-            <TextInput
-              value={email}
-              style={styles.input}
-              placeholder="Email"
-              autoCapitalize="none"
-              onChangeText={(text) => setEmail(text)}
-            ></TextInput>
-            <TextInput
-              secureTextEntry={true}
-              value={password}
-              style={styles.input}
-              placeholder="Password"
-              autoCapitalize="none"
-              onChangeText={(text) => setPassword(text)}
-            ></TextInput>
+        {register ? (
+          <>
+            <View style={styles.root2}>
+              <Text
+                style={{
+                  fontSize: 35,
+                  justifyContent: "center",
+                  color: "#7eaf34",
+                  letterSpacing: 5,
+                  fontFamily: "SpaceMono_400Regular",
+                  fontWeight: 500,
+                  paddingBottom: 10,
+                }}
+              >
+                5IVES
+              </Text>
+              
+            </View>
+            <View style={styles.root3}></View>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : null}
+              style={{ flex: 1 }}
+            >
+              <View style={styles.container3}>
+              <View style={styles.root4}>
+              <Text
+                style={{
+                  fontSize: 25,
+                  justifyContent: "center",
+                  color: "#7eaf34",
+                  letterSpacing: 2,
+                  fontFamily: "SpaceMono_400Regular",
+                  fontWeight: 500,
+                  alignItems: "center",
+                }}
+              >
+                LETS GET STARTED!
+              </Text>
+              </View>
+              
+                <ProfilePhotoContainer onPress={addProfilePicture}>
+                  {profilePicture ? (
+                    <ProfilePicture source={{ uri: profilePicture }} />
+                  ) : (
+                    <DefaultProfilePhoto>
+                      <AntDesign name="plus" size={24} color="#ffffff" />
+                    </DefaultProfilePhoto>
+                  )}
+                </ProfilePhotoContainer>  
+                <View style={{ justifyContent: "center", paddingBottom: 20, alignItems: "center", paddingTop: 10}}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      justifyContent: "center",
+                      color: "#7eaf34",
+                      fontFamily: "SpaceMono_400Regular",
+                      fontWeight: 500,
+                    }}
+                  >
+                    ADD A PROFILE PICTURE
+                  </Text>
+                </View>
+                <TextInput
+                  value={name}
+                  style={styles.input}
+                  placeholder="Name"
+                  autoCapitalize="none"
+                  onChangeText={(text) => setName(text)}
+                ></TextInput>
+                <TextInput
+                  value={email}
+                  style={styles.input}
+                  placeholder="Email"
+                  autoCapitalize="none"
+                  onChangeText={(text) => setEmail(text)}
+                ></TextInput>
+                <TextInput
+                  secureTextEntry={true}
+                  value={password}
+                  style={styles.input}
+                  placeholder="Password"
+                  autoCapitalize="none"
+                  onChangeText={(text) => setPassword(text)}
+                ></TextInput>
 
-            {loading ? (
-              <ActivityIndicator size="large" color="#7eaf34" />
-            ) : (
-              <CustomButton text="Log in" onPress={signIn} />
-            )}
-          </View>
-        </KeyboardAvoidingView>
-        <View style={styles.container2}>
-          <View style={{ flexDirection: "row" }}>
-            <View style={styles.horizontalRule} />
-            <Text style={styles.options}>Or log in with</Text>
-            <View style={styles.horizontalRule} />
-          </View>
+                {loading ? (
+                  <ActivityIndicator size="large" color="#7eaf34" />
+                ) : (
+                  <CustomButton text="Create an account" onPress={signIn} />
+                )}
+              </View>
 
-          <View style={styles.rowForGoogle}>
-            <TouchableOpacity onPress={() => {}} style={styles.googleOption}>
-              <SvgXml xml={xml} height={24} width={24} />
-            </TouchableOpacity>
-          </View>
-        
-        <View style={styles.signUpRow}>
-          <Text style={{ color: "#fff" }}>Dont have an account? </Text>
-          <TouchableOpacity onPress={() => signUp()}>
-            <Text style={{ color: "#7eaf34" }}>Sign up</Text>
-          </TouchableOpacity>
-        </View>
-        </View>
+            </KeyboardAvoidingView>
+            <View style={styles.container2}>
+              <View style={styles.signUpRow}>
+                <Text style={{ color: "#fff" }}>Already have an account? </Text>
+                <TouchableOpacity onPress={handlePageChange}>
+                  <Text style={{ color: "#7eaf34" }}>Sign In</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>
+        ) : (
+          <>
+            <View style={styles.root}>
+              <Text
+                style={{
+                  fontSize: 35,
+                  justifyContent: "center",
+                  color: "#7eaf34",
+                  paddingBottom: 20,
+                  letterSpacing: 5,
+                  height: 60,
+                  fontFamily: "SpaceMono_400Regular",
+                  fontWeight: 500,
+                }}
+              >
+                5IVES
+              </Text>
+            </View>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : null}
+              style={{ flex: 1 }}
+            >
+              <View style={styles.container}>
+                <TextInput
+                  value={email}
+                  style={styles.input}
+                  placeholder="Email"
+                  autoCapitalize="none"
+                  onChangeText={(text) => setEmail(text)}
+                ></TextInput>
+                <TextInput
+                  secureTextEntry={true}
+                  value={password}
+                  style={styles.input}
+                  placeholder="Password"
+                  autoCapitalize="none"
+                  onChangeText={(text) => setPassword(text)}
+                ></TextInput>
+
+                {loading ? (
+                  <ActivityIndicator size="large" color="#7eaf34" />
+                ) : (
+                  <CustomButton text="Log in" onPress={signIn} />
+                )}
+              </View>
+            </KeyboardAvoidingView>
+            <View style={styles.container2}>
+              <View style={{ flexDirection: "row" }}>
+                <View style={styles.horizontalRule} />
+                <Text style={styles.options}>Or log in with</Text>
+                <View style={styles.horizontalRule} />
+              </View>
+
+              <View style={styles.rowForGoogle}>
+                <TouchableOpacity
+                  onPress={signInGoogle}
+                  style={styles.googleOption}
+                >
+                  <SvgXml xml={xml} height={24} width={24} />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.signUpRow}>
+                <Text style={{ color: "#fff" }}>Dont have an account? </Text>
+                <TouchableOpacity onPress={handlePageChange}>
+                  <Text style={{ color: "#7eaf34" }}>Sign up</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>
+        )}
       </ImageBackground>
     </View>
   );
@@ -142,6 +365,10 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     paddingBottom: 50,
   },
+  container3: {
+    marginHorizontal: 40,
+    justifyContent: "flex-end",
+  },
   input: {
     marginVertical: 5,
     paddingHorizontal: 10,
@@ -153,6 +380,29 @@ const styles = StyleSheet.create({
   },
   root: {
     alignItems: "center",
+    justifyContent: "center",
+    height: 475,
+  },
+  root2: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 100,
+    paddingTop: 40,
+  },
+  root3: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 125,
+    paddingBottom: 100,
+  },
+  root4: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 50,
+  },
+  logo: {
+    marginTop: 0,
+    height: 200,
   },
   options: {
     textAlign: "center",
@@ -186,3 +436,23 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
 });
+
+const ProfilePhotoContainer = styled.TouchableOpacity`
+  background-color: #e1e2e6;
+  width: 100px;
+  height: 100px;
+  border-radius: 50px;
+  align-self: center;
+  overflow: hidden;
+  marginbottom: 20px;
+`;
+
+const DefaultProfilePhoto = styled.View`
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+`;
+const ProfilePicture = styled.Image`
+  flex: 1;
+
+`

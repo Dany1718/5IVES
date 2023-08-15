@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "sevens",
+    "name": "5IVES",
     "slug": "sevens",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,16 +15,20 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.5IVES",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.sevens"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": ["@react-native-google-signin/google-signin"]
   }
 }
