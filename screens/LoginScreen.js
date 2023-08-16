@@ -39,6 +39,7 @@ GoogleSignin.configure({
 
 const LoginScreen = () => {
   const [name, setName] = useState("");
+  const [userName, setUserName] = useState("");
   const [profilePicture, setProfilePicture] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -176,57 +177,40 @@ const LoginScreen = () => {
       >
         {register ? (
           <>
-            <View style={styles.root2}>
-            <Text
-                style={{
-                  fontSize: 35,
-                  justifyContent: "center",
-                  color: "#7eaf34",
-                  paddingBottom: 20,
-                  letterSpacing: 5,
-                  height: 60,
-                  fontFamily: "SpaceMono_700Bold",
-                  fontWeight: 500,
-                }}
-              >
-                5
-              </Text>
-              <Text
-                style={{
-                  fontSize: 35,
-                  justifyContent: "center",
-                  color: "#7eaf34",
-                  letterSpacing: 5,
-                  fontFamily: "SpaceMono_400Regular",
-                  fontWeight: 500,
-                  paddingBottom: 10,
-                }}
-              >
-                IVES
-              </Text>
-            </View>
             <View style={styles.root3}></View>
             <KeyboardAvoidingView
               behavior={Platform.OS === "ios" ? "padding" : null}
               style={{ flex: 1 }}
             >
               <View style={styles.container3}>
-                <View style={styles.root4}>
+                <View style={styles.root5}>
                   <Text
                     style={{
-                      fontSize: 25,
+                      fontSize: 35,
                       justifyContent: "center",
                       color: "#7eaf34",
-                      letterSpacing: 2,
-                      fontFamily: "SpaceMono_400Regular",
+                      letterSpacing: 5,
+                      height: 60,
+                      fontFamily: "SpaceMono_700Bold",
                       fontWeight: 500,
-                      alignItems: "center",
                     }}
                   >
-                    LETS GET STARTED!
+                    5
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 35,
+                      justifyContent: "center",
+                      color: "#7eaf34",
+                      letterSpacing: 5,
+                      height: 60,
+                      fontFamily: "SpaceMono_400Regular",
+                      fontWeight: 500,
+                    }}
+                  >
+                    IVES
                   </Text>
                 </View>
-
                 <ProfilePhotoContainer onPress={addProfilePicture}>
                   {profilePicture ? (
                     <ProfilePicture source={{ uri: profilePicture }} />
@@ -239,9 +223,8 @@ const LoginScreen = () => {
                 <View
                   style={{
                     justifyContent: "center",
-                    paddingBottom: 20,
+                    paddingBottom: 10,
                     alignItems: "center",
-                    paddingTop: 10,
                   }}
                 >
                   <Text
@@ -251,6 +234,7 @@ const LoginScreen = () => {
                       color: "#7eaf34",
                       fontFamily: "SpaceMono_400Regular",
                       fontWeight: 500,
+                      paddingTop: 10,
                     }}
                   >
                     ADD A PROFILE PICTURE
@@ -262,6 +246,13 @@ const LoginScreen = () => {
                   placeholder="Name"
                   autoCapitalize="none"
                   onChangeText={(text) => setName(text)}
+                ></TextInput>
+                <TextInput
+                  value={userName}
+                  style={styles.input}
+                  placeholder="Username"
+                  autoCapitalize="none"
+                  onChangeText={(text) => setUserName(text)}
                 ></TextInput>
                 <TextInput
                   value={email}
@@ -278,7 +269,10 @@ const LoginScreen = () => {
                   autoCapitalize="none"
                   onChangeText={(text) => setPassword(text)}
                 ></TextInput>
-
+              </View>
+              
+              <View style={styles.container4}>
+              <Text style={{paddingBottom: 15, color: "#fff"}}>By signing up, you agree to our Terms, Privacy Policy, and Cookies Policy.</Text>
                 {loading ? (
                   <ActivityIndicator size="large" color="#7eaf34" />
                 ) : (
@@ -347,14 +341,16 @@ const LoginScreen = () => {
                   autoCapitalize="none"
                   onChangeText={(text) => setPassword(text)}
                 ></TextInput>
-
-                {loading ? (
-                  <ActivityIndicator size="large" color="#7eaf34" />
-                ) : (
-                  <CustomButton text="Log in" onPress={signIn} />
-                )}
               </View>
             </KeyboardAvoidingView>
+            <View style={styles.container}>
+              {loading ? (
+                <ActivityIndicator size="large" color="#7eaf34" />
+              ) : (
+                <CustomButton text="Log in" onPress={signIn} />
+              )}
+            </View>
+
             <View style={styles.container2}>
               <View style={{ flexDirection: "row" }}>
                 <View style={styles.horizontalRule} />
@@ -395,11 +391,16 @@ const styles = StyleSheet.create({
   container2: {
     marginHorizontal: 40,
     justifyContent: "flex-end",
-    paddingBottom: 50,
   },
   container3: {
     marginHorizontal: 40,
     justifyContent: "flex-end",
+    paddingTop: 82,
+  },
+  container4: {
+    marginHorizontal: 40,
+    justifyContent: "flex-end",
+    paddingTop: 10,
   },
   input: {
     marginVertical: 5,
@@ -414,14 +415,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: 475,
-    flexDirection: "row"
+    flexDirection: "row",
   },
   root2: {
     alignItems: "center",
     justifyContent: "center",
     height: 100,
     paddingTop: 40,
-    flexDirection: "row"
+    flexDirection: "row",
   },
   root3: {
     alignItems: "center",
@@ -433,6 +434,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: 50,
+  },
+  root5: {
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    paddingBottom: 0,
   },
   logo: {
     marginTop: 0,
@@ -461,7 +468,7 @@ const styles = StyleSheet.create({
   signUpRow: {
     flexDirection: "row",
     justifyContent: "center",
-    marginBottom: 30,
+    marginBottom: 45,
   },
   horizontalRule: {
     backgroundColor: "grey",
@@ -478,7 +485,6 @@ const ProfilePhotoContainer = styled.TouchableOpacity`
   border-radius: 50px;
   align-self: center;
   overflow: hidden;
-  marginbottom: 20px;
 `;
 
 const DefaultProfilePhoto = styled.View`

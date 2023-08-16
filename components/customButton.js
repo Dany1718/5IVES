@@ -15,10 +15,10 @@ const styles = StyleSheet.create({
     container: {
       backgroundColor: '#7eaf34',
       width: '100%',
-      padding: 12,
+      padding: 10,
       marginVertical: 5,
       alignItems: 'center',
-      borderRadius: 5,
+      borderRadius: 10,
 
     },
     text: {

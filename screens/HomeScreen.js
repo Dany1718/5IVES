@@ -6,11 +6,11 @@ import {
   TextInput,
   TouchableWithoutFeedback,
   Keyboard,
+  TouchableOpacity,
 } from "react-native";
 import React, { useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import {
   useFonts,
   SpaceMono_400Regular,
@@ -65,23 +65,25 @@ const HomeScreen = () => {
             <ChevronDownIcon size={20} color="#7eaf34" />
           </Text>
         </View>
-        <UserIcon size={35} color="#7eaf34" style={{ paddingRight: 5 }} />
+        <TouchableOpacity onPress={() => {navigation.navigate("Profile")}}>
+        <UserIcon size={35} color="#fff" style={{ paddingRight: 5 }} />
+        </TouchableOpacity>
       </View>
       {/* SEARCH */}
 
       <View className="flex-row items-center space-x-2  pb-2  mx-4">
         <TouchableWithoutFeedback onPress={Keyboard.dismiss()}>
-          <View style={styles.searchStyle}>
-            <MagnifyingGlassIcon color="#7eaf34" size={20} />
+          <View className="flex-row flex-1 bg-gray-700 p-3 rounded-lg h-9 items-center">
+            <MagnifyingGlassIcon color="#fff" size={20} />
             <TextInput
-              style={{ paddingLeft: 5, width: 300 }}
+              style={{ flex: 1, marginLeft: 8, color: "white" }}
               placeholder="Search"
               keyboardType="default"
-              
+              placeholderTextColor="#fff"
             />
           </View>
         </TouchableWithoutFeedback>
-        <AdjustmentsVerticalIcon color="#7eaf34" />
+        <AdjustmentsVerticalIcon color="#fff" />
       </View>
       {/* Add logic to render ionicons if no picture, and render image if there is a profile picture/*}
           {/*<Image source={require("../assets/defaultProfilePicture2.png")} style={{
@@ -115,14 +117,13 @@ const styles = StyleSheet.create({
   },
   searchStyle: {
     flexDirection: "row",
-    width: 300,
+    width: 400,
     height: 40,
-    backgroundColor: "#fff",
+    backgroundColor: "#5A5A5A",
     paddingVertical: 10,
     paddingHorizontal: 15,
-    borderColor: "#ccc",
     borderWidth: 1,
-    borderRadius: 15,
+    borderRadius: 10,
     fontSize: 16,
   },
 });

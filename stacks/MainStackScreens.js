@@ -4,6 +4,7 @@ import PostScreen from "../screens/PostScreen"
 import LiveScreen from '../screens/LiveScreen';
 import MessageScreen from "../screens/MessageScreen";
 import NotificationScreen from '../screens/NotificationScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { Ionicons } from '@expo/vector-icons'
 
@@ -80,6 +81,7 @@ const MainStackScreens = () => {
           <MainStack.Screen name="Post" component={PostScreen} />
           <MainStack.Screen name="Notification" component={NotificationScreen} />
           <MainStack.Screen name="Message" component={MessageScreen} />
+          <MainStack.Screen name="Profile" component={ProfileScreen}  options={{tabBarButton: () => null}}/>
         </MainStack.Navigator>
     );
 }
