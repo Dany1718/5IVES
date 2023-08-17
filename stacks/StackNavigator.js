@@ -1,25 +1,22 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import React from "react";
+import React, { useContext } from "react";
 import MainStackScreens from "./MainStackScreens";
 import AuthStackScreens from "./AuthStackScreens";
 import { useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { FIREBASE_AUTH } from "../FirebaseConfig";
+import { FirebaseContext } from "../components/FireBaseContext";
+import { UserContext } from "../components/UserContext";
+//import { FIREBASE_AUTH } from "../FirebaseConfig";
 
 const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    onAuthStateChanged(FIREBASE_AUTH, (user) => {
-      setUser(user);
-    });
-  }, []);
-
+  const [user] = useContext(UserContext);
+  const firebase = useContext(FirebaseContext);
+  console.log(user);
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      {user ? (
+      {user.isLoggedIn ? (
         <Stack.Screen name="Main" component={MainStackScreens}/>
       ) : (
         <Stack.Screen name="Auth" component={AuthStackScreens}/>

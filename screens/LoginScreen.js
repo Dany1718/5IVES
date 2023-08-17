@@ -10,7 +10,7 @@ import {
   Platform,
 } from "react-native";
 import styled from "styled-components/native";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useContext } from "react";
 import tw from "tailwind-react-native-classnames";
 import { FIREBASE_AUTH } from "../FirebaseConfig";
 import {
@@ -31,7 +31,8 @@ import {
   SpaceMono_700Bold,
   SpaceMono_700Bold_Italic,
 } from "@expo-google-fonts/space-mono";
-
+import { FirebaseContext } from "../components/FireBaseContext";
+import { UserContext } from "../components/UserContext";
 GoogleSignin.configure({
   webClientId:
     "323061027026-67go2ubi9im7crevaeo7oi7hlqc8op7m.apps.googleusercontent.com", // client ID of type WEB for your server (needed to verify user ID and offline access)
@@ -46,6 +47,8 @@ const LoginScreen = () => {
   const [loading, setLoading] = useState(false);
   const [register, setRegister] = useState(false);
   const [appIsReady, setAppIsReady] = useState(false);
+  const [_, setUser] = useContext(UserContext);
+  const firebase = useContext(FirebaseContext);
   const auth = FIREBASE_AUTH;
   useFonts({
     SpaceMono_400Regular,
@@ -61,7 +64,6 @@ const LoginScreen = () => {
       } catch (e) {
         console.warn(e);
       } finally {
-        // Tell the application to render
         setAppIsReady(true);
       }
     }
@@ -111,10 +113,23 @@ const LoginScreen = () => {
 
   const signInGoogle = async () => {
     try {
-      await GoogleSignin.hasPlayServices();
-      const { idToken } = await GoogleSignin.signIn();
-      const googleCredentials = GoogleAuthProvider.credential(idToken);
-      await signInWithCredential(auth, googleCredentials);
+      await firebase.signInGoogle();
+      const uid = firebase.getCurrentUser().uid;
+      const userInfo = await firebase.getUserInfo(uid);
+      
+      // Check if the userInfo object has the required properties before updating the user state
+      if (userInfo && userInfo.name && userInfo.userName && userInfo.email && userInfo.profilePictureUrl) {
+        setUser({
+          name: userInfo.name,
+          username: userInfo.userName,
+          email: userInfo.email,
+          uid,
+          profilePictureUrl: userInfo.profilePictureUrl,
+          isLoggedIn: true,
+        });
+      } else {
+        console.log("User info is incomplete or missing");
+      }
     } catch (error) {
       console.log("got error: ", error.message);
     }
@@ -123,8 +138,20 @@ const LoginScreen = () => {
   const signIn = async () => {
     setLoading(true);
     try {
-      const response = await signInWithEmailAndPassword(auth, email, password);
-      console.log(response);
+      //const response = await signInWithEmailAndPassword(auth, email, password);
+      response = await firebase.signIn(email, password);
+      const uid = firebase.getCurrentUser().uid;
+      const userInfo = await firebase.getUserInfo(uid);
+
+      setUser({
+        name: userInfo.name,
+        username: userInfo.username,
+        email: userInfo.email,
+        uid,
+        profilePhotoUrl: userInfo.profilePhotoUrl,
+        isLoggedIn: true,
+      });
+      console.log(userInfo);
     } catch (error) {
       console.log(error);
       alert("Sign in failed: " + error.message);
@@ -135,13 +162,12 @@ const LoginScreen = () => {
 
   const signUp = async () => {
     setLoading(true);
+    const user = { name, userName, email, password, profilePicture };
+    
     try {
-      const response = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      console.log(response);
+      const createdUser = await firebase.createUser(user);
+      setUser({ ...createdUser, isLoggedIn:true });
+
     } catch (error) {
       console.log(error);
       alert("Sign in failed: " + error.message);
@@ -270,13 +296,16 @@ const LoginScreen = () => {
                   onChangeText={(text) => setPassword(text)}
                 ></TextInput>
               </View>
-              
+
               <View style={styles.container4}>
-              <Text style={{paddingBottom: 15, color: "#fff"}}>By signing up, you agree to our Terms, Privacy Policy, and Cookies Policy.</Text>
+                <Text style={{ paddingBottom: 15, color: "#fff" }}>
+                  By signing up, you agree to our Terms, Privacy Policy, and
+                  Cookies Policy.
+                </Text>
                 {loading ? (
                   <ActivityIndicator size="large" color="#7eaf34" />
                 ) : (
-                  <CustomButton text="Create an account" onPress={signIn} />
+                  <CustomButton text="Create an account" onPress={signUp} />
                 )}
               </View>
             </KeyboardAvoidingView>
@@ -368,7 +397,7 @@ const LoginScreen = () => {
               </View>
 
               <View style={styles.signUpRow}>
-                <Text style={{ color: "#fff" }}>Dont have an account? </Text>
+                <Text style={{ color: "#fff" }}>Don't have an account? </Text>
                 <TouchableOpacity onPress={handlePageChange}>
                   <Text style={{ color: "#7eaf34" }}>Sign up</Text>
                 </TouchableOpacity>
