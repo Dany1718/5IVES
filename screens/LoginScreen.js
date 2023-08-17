@@ -41,7 +41,7 @@ GoogleSignin.configure({
 const LoginScreen = () => {
   const [name, setName] = useState("");
   const [userName, setUserName] = useState("");
-  const [profilePicture, setProfilePicture] = useState(null);
+  const [profilePictureUrl, setProfilePictureUrl] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -93,7 +93,7 @@ const LoginScreen = () => {
       });
 
       if (!result.canceled) {
-        setProfilePicture(result.assets[0].uri);
+        setProfilePictureUrl(result.assets[0].uri);
       }
     } catch (error) {
       console.log("Error @pickImage: ", error);
@@ -113,20 +113,13 @@ const LoginScreen = () => {
 
   const signInGoogle = async () => {
     try {
-      await firebase.signInGoogle();
+      const createdUser = await firebase.signInGoogle();
       const uid = firebase.getCurrentUser().uid;
       const userInfo = await firebase.getUserInfo(uid);
       
       // Check if the userInfo object has the required properties before updating the user state
       if (userInfo && userInfo.name && userInfo.userName && userInfo.email && userInfo.profilePictureUrl) {
-        setUser({
-          name: userInfo.name,
-          username: userInfo.userName,
-          email: userInfo.email,
-          uid,
-          profilePictureUrl: userInfo.profilePictureUrl,
-          isLoggedIn: true,
-        });
+        setUser({ ...createdUser, isLoggedIn:true });
       } else {
         console.log("User info is incomplete or missing");
       }
@@ -162,7 +155,7 @@ const LoginScreen = () => {
 
   const signUp = async () => {
     setLoading(true);
-    const user = { name, userName, email, password, profilePicture };
+    const user = { name, userName, email, password, profilePictureUrl };
     
     try {
       const createdUser = await firebase.createUser(user);
@@ -238,8 +231,8 @@ const LoginScreen = () => {
                   </Text>
                 </View>
                 <ProfilePhotoContainer onPress={addProfilePicture}>
-                  {profilePicture ? (
-                    <ProfilePicture source={{ uri: profilePicture }} />
+                  {profilePictureUrl ? (
+                    <ProfilePicture source={{ uri: profilePictureUrl }} />
                   ) : (
                     <DefaultProfilePhoto>
                       <AntDesign name="plus" size={24} color="#ffffff" />

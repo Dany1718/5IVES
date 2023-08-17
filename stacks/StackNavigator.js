@@ -12,8 +12,6 @@ const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
   const [user] = useContext(UserContext);
-  const firebase = useContext(FirebaseContext);
-  console.log(user);
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       {user.isLoggedIn ? (

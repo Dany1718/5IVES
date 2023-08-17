@@ -18,12 +18,14 @@ import {
   doc,
   setDoc,
   getDoc,
+  updateDoc,
   collection,
 } from "firebase/firestore";
 import firebase from "../config/firebase";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
-import { getStorage, ref, uploadBytes, getDownloadURL, updateDoc } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL} from 'firebase/storage';
+
 
 const FIREBASE_APP = initializeApp(config);
 const FIREBASE_AUTH = getAuth(FIREBASE_APP);
@@ -49,7 +51,7 @@ const Firebase = {
       const uid = authResult.user.uid;
       const userDocRef = doc(collection(db, "users"), uid);
       const userDocSnapshot = await getDoc(userDocRef);
-
+      let profilePicUrl = "default";
       if (!userDocSnapshot.exists()) {
         // User data doesn't exist in Firestore, create it
         const user = authResult.user;
@@ -60,6 +62,13 @@ const Firebase = {
           profilePictureUrl: user.photoURL,
         };
         await setDoc(userDocRef, basicUserData);
+        
+        if (basicUserData.profilePictureUrl) {
+          profilePicUrl = await Firebase.uploadProfilePic(basicUserData.profilePictureUrl);
+        }
+
+        delete user.password;
+        return { ...user, profilePicUrl, uid };
       }
 
     } catch (error) {
@@ -125,9 +134,8 @@ const Firebase = {
         profilePicUrl,
       });
 
-      if (user.profilePicture) {
-        profilePicUrl = await Firebase.uploadProfilePic(user.profilePicture);
-        console.log(profilePicUrl);
+      if (user.profilePictureUrl) {
+        profilePicUrl = await Firebase.uploadProfilePic(user.profilePictureUrl);
       }
       delete user.password;
 
