@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useContext } from "react";
 import MainStackScreens from "./MainStackScreens";
 import AuthStackScreens from "./AuthStackScreens";
+import LoadingScreen from "../screens/LoadingScreen";
 import { useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { FirebaseContext } from "../components/FireBaseContext";
@@ -14,7 +15,9 @@ const StackNavigator = () => {
   const [user] = useContext(UserContext);
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      {user.isLoggedIn ? (
+      {user.isLoggedIn === null ? (
+        <Stack.Screen name="Loading" component={LoadingScreen}/>
+      ) : user.isLoggedIn ?(
         <Stack.Screen name="Main" component={MainStackScreens}/>
       ) : (
         <Stack.Screen name="Auth" component={AuthStackScreens}/>

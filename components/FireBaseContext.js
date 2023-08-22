@@ -125,17 +125,17 @@ const Firebase = {
       );
       const uid = Firebase.getCurrentUser().uid;
 
-      let profilePicUrl = "default";
+      let profilePictureUrl = "default";
       const dbUsers = collection(db, "users");
       await setDoc(doc(dbUsers, uid), {
         name: user.name,
         username: user.userName,
         email: user.email,
-        profilePicUrl,
+        profilePictureUrl,
       });
 
       if (user.profilePictureUrl) {
-        profilePicUrl = await Firebase.uploadProfilePic(user.profilePictureUrl);
+        profilePictureUrl = await Firebase.uploadProfilePic(user.profilePictureUrl);
       }
       delete user.password;
 

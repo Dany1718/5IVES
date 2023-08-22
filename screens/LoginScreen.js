@@ -46,7 +46,7 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [register, setRegister] = useState(false);
-  const [appIsReady, setAppIsReady] = useState(false);
+  //const [appIsReady, setAppIsReady] = useState(false);
   const [_, setUser] = useContext(UserContext);
   const firebase = useContext(FirebaseContext);
   const auth = FIREBASE_AUTH;
@@ -57,7 +57,7 @@ const LoginScreen = () => {
     SpaceMono_700Bold_Italic,
   });
 
-  useEffect(() => {
+  /*useEffect(() => {
     async function prepare() {
       try {
         await new Promise((resolve) => setTimeout(resolve, 1));
@@ -69,7 +69,7 @@ const LoginScreen = () => {
     }
 
     prepare();
-  }, []);
+  }, []);*/
 
   const handlePageChange = () => {
     register ? setRegister(false) : setRegister(true);
@@ -178,7 +178,7 @@ const LoginScreen = () => {
       <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z"/>
     </g>
   </svg>`;
-  const onLayoutRootView = useCallback(async () => {
+  /*const onLayoutRootView = useCallback(async () => {
     if (appIsReady) {
       await SplashScreen.hideAsync();
     }
@@ -186,7 +186,7 @@ const LoginScreen = () => {
 
   if (!appIsReady) {
     return null;
-  }
+  }*/
   return (
     <View style={tw`flex-1`}>
       <ImageBackground
