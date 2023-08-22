@@ -139,7 +139,7 @@ const Firebase = {
       }
       delete user.password;
 
-      return { ...user, profilePicUrl, uid };
+      return { ...user, profilePictureUrl, uid };
     } catch (error) {
       if (
         error.message ===
